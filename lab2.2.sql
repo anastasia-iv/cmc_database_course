@@ -2,6 +2,7 @@ DROP SCHEMA IF EXISTS art CASCADE;
 CREATE SCHEMA art;
 CREATE TYPE comp_types AS ENUM ('живопись', 'графика', 'скульптура', 'литье', 'роспись', 'архитектура', 'витраж', 'литература', 'кинематограф');
 CREATE TYPE loc_types AS ENUM ('галерея', 'кинотеатр', 'музей', 'консерватория', 'собор', 'церковь', 'кирха');
+CREATE TYPE units AS ENUM ('см', 'м');
 CREATE TYPE directions AS ENUM ('готика', 'возрождение', 'маньеризм', 'барокко', 'классицизм', 'романтизм', 'сентиментализм', 'реализм', 'символизм', 'импрессионизм', 'пуантилизм', 'постимпрессионизм', 'модерн', 'авангард', 'сезаннизм','фовизм', 'примитивизм', 'кубизм', 'сюрреализм', 'футуризм');
 CREATE TYPE ticket_types AS ENUM ('льготный_входной', 'льготный_экскурсионный', 'входной', 'экскурсионный', 'льготный_абонемент', 'абонемент');
 
@@ -12,7 +13,7 @@ CREATE TABLE art.Countries (
 CREATE TABLE art.Cities (
   	city_id SERIAL PRIMARY KEY,
   	city_name	varchar(50) NOT NULL,
-  	country_id integer CONSTRAINT city_country REFERENCES art.Countries ON UPDATE CASCADE 
+  	country_id integer
 );
 
 CREATE TABLE art.Creators (
@@ -20,7 +21,7 @@ CREATE TABLE art.Creators (
   	cr_name	varchar(60),
   	birth_date date,
   	death_date date,
-  	country_id integer CONSTRAINT cr_country REFERENCES art.Countries ON UPDATE CASCADE
+  	country_id integer
 );
 
 CREATE TABLE art.Direction (
@@ -46,7 +47,7 @@ CREATE TABLE art.Library (
   	library_id SERIAL PRIMARY KEY,
   	library_name text NOT NULL,
     city_id	integer CONSTRAINT l_city REFERENCES art.Cities ON UPDATE CASCADE,
-  	address text NOT NULL UNIQUE
+  	address text NOT NULL
 );
 
 CREATE TABLE art.Books_in_libraries (
@@ -91,7 +92,7 @@ CREATE TABLE art.Compositions (
     comp_name text NOT NULL,
     comp_type comp_types NOT NULL,
     dimension text,
-    dimension_units varchar(15),
+    dimension_units units,
     location_id integer CONSTRAINT c_loc REFERENCES art.Location ON UPDATE CASCADE,
     cr_id integer CONSTRAINT c_cr REFERENCES art.Creators ON UPDATE CASCADE,
     direction_id integer CONSTRAINT c_dir REFERENCES art.Direction ON UPDATE CASCADE	
@@ -364,7 +365,3 @@ INSERT INTO art.Compositions (comp_name, comp_type, dimension, dimension_units, 
   ('Дома в Эстаке', 'живопись', '40,5 х 32,5' , 'см', 10, 6, 17),
   ('Впечатление. Восходящее Солнце', 'живопись', '48 х 63' , 'см', 9, 5, 15),
   ('Странник над Морем Тумана', 'архитектура', '94,8 х 74,8' , 'см', 8, 4, 6);
-
-
-
-
