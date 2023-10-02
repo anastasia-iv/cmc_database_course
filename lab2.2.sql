@@ -1,4 +1,4 @@
-DROP SCHEMA IF EXISTS schedule CASCADE;
+DROP SCHEMA IF EXISTS art CASCADE;
 CREATE SCHEMA art;
 CREATE TYPE comp_types AS ENUM ('живопись', 'графика', 'скульптура', 'литье', 'роспись', 'архитектура', 'витраж', 'литература', 'кинематограф');
 CREATE TYPE loc_types AS ENUM ('галерея', 'кинотеатр', 'музей', 'консерватория', 'собор', 'церковь', 'кирха');
