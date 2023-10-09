@@ -83,7 +83,7 @@ SQL-состояние: 23514
 */
 
 --Студент-искусствовед отчислился или перевелся на ПМИ
-DELETE FROM schedule.students
+DELETE FROM art.students
 WHERE student_id = 6;
 
-SELECT * FROM schedule.exams
+SELECT * FROM art.students
