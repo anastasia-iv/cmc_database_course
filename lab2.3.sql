@@ -88,7 +88,7 @@ WHERE student_id = 6;
 
 SELECT * FROM art.students
 
---Задаётся ticket: location_id = 1, ticket_type = "входной", ticket_cost = 5
+--Задаётся ticket: comp_id = 1, ticket_type = "входной", ticket_cost = 5
 --Добавляем его в таблицу tickets
 --В таблице students_tickets отображаем покупку этого билета студентом student_id = 2
 
