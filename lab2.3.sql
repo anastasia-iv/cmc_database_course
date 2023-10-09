@@ -87,3 +87,20 @@ DELETE FROM art.students
 WHERE student_id = 6;
 
 SELECT * FROM art.students
+
+--Задаётся ticket: location_id = 1, ticket_type = "входной", ticket_cost = 5
+--Добавляем его в таблицу tickets
+--В таблице students_tickets отображаем покупку этого билета студентом student_id = 2
+
+WITH loc_for_comp AS (
+	SELECT location_id FROM art.compositions
+	WHERE comp_id = 1
+),
+new_ticket_id AS (
+	INSERT INTO art.tickets (ticket_id, location_id, ticket_type, ticket_cost_dollars)
+ 	VALUES (DEFAULT, (SELECT location_id FROM art.compositions
+	WHERE comp_id = 1), 'входной', 5)
+	RETURNING ticket_id
+)
+	
+INSERT INTO art.students_tickets VALUES (2, (SELECT * FROM new_ticket_id))
