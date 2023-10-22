@@ -1,0 +1,363 @@
+CREATE TABLE store (
+    id SERIAL PRIMARY KEY,
+    name varchar(100),
+    location varchar(100) 
+);
+
+CREATE TABLE laptop (
+    id SERIAL PRIMARY KEY,
+    model varchar(30),
+    screen_size numeric(10, 2),
+    cpu varchar(30),
+    video_card varchar(30),
+    memory_size integer
+);
+
+CREATE TABLE offer (
+    id SERIAL PRIMARY KEY,
+    laptop_id SERIAL REFERENCES laptop ON DELETE CASCADE,
+    store_id SERIAL REFERENCES store ON DELETE CASCADE,
+    price numeric(10, 2),
+    batch_size integer,
+    discount_dates timestamp[],
+    description text
+);
+
+CREATE TABLE sale (
+    id SERIAL PRIMARY KEY,
+    offer_id SERIAL REFERENCES offer ON DELETE CASCADE,
+    laptop_id SERIAL REFERENCES laptop ON DELETE CASCADE,
+    customer_fio varchar(50),
+    customer_info jsonb,
+    sale_date timestamp
+);
+
+DROP TABLE sale;
+DROP TABLE offer;
+DROP TABLE laptop;
+DROP TABLE store;
+
+CREATE FUNCTION generate_address()
+RETURNS VARCHAR(100) AS $$
+DECLARE
+  street_names VARCHAR[];
+  street_name VARCHAR(50);
+  house_number INT;
+  postal_code VARCHAR(10);
+BEGIN
+  street_names := ARRAY['Main Street', 'Oak Avenue', 'Maple Drive', 'Elm Street', 'Cedar Lane', 'Pine Road', 'Birch Street', 'Willow Avenue', 'Cherry Lane', 'Cypress Road'];
+  street_name := street_names[1 + floor(random() * 10)];
+
+  house_number := floor(random() * 1000);
+  postal_code := floor(random() * 10000)::VARCHAR;
+
+  RETURN street_name  ' '  house_number  ', '  postal_code;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION generate_store_name()
+RETURNS VARCHAR(100) AS $$
+DECLARE
+  store_names VARCHAR[];
+  random_index INT;
+BEGIN
+  store_names := ARRAY[
+    'Laptop Land',
+    'Notebook Nirvana',
+    'Gadget Galaxy',
+    'Tech Titan',
+    'Mobile Machines',
+    'PC Pavilion',
+    'Computer Corner',
+    'Digital Domain',
+    'Electronics Emporium',
+    'Laptop Haven',
+    'Gadget Galleria'
+  ];
+
+  random_index := 1 + floor(random() * 10);
+
+  RETURN store_names[random_index];
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TEMP TABLE temp_data AS
+WITH random_data AS (
+    SELECT
+        generate_series(1, 1200) AS id,
+        generate_store_name() AS name,
+        generate_address() AS location
+)
+SELECT * FROM random_data;
+
+INSERT INTO store (id, name, location)
+SELECT id, name, location
+FROM temp_data;
+
+DROP TABLE temp_data;
+
+CREATE OR REPLACE FUNCTION generate_laptop_model()
+RETURNS VARCHAR(30) AS $$
+DECLARE
+  laptop_models VARCHAR[];
+  random_index INT;
+BEGIN
+  laptop_models := ARRAY[
+    'Dell XPS 13',
+    'HP Spectre x360',
+    'Lenovo ThinkPad X1 Carbon',
+    'Asus ZenBook 14',
+    'Acer Predator Helios 300',
+    'Microsoft Surface Laptop',
+    'MSI GS66 Stealth',
+    'LG Gram 17',
+    'Razer Blade 15',
+    'Huawei MateBook X Pro',
+    'Toshiba Satellite',
+    'Sony VAIO Z',
+    'Samsung Galaxy Book',
+    'Google Pixelbook'
+  ];
+
+  random_index := 1 + floor(random() * 14);
+
+  RETURN laptop_models[random_index];
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION generate_screen_size()
+RETURNS NUMERIC AS $$
+DECLARE
+  screen_sizes NUMERIC[];
+  random_index INT;
+BEGIN
+  screen_sizes := ARRAY[
+    13.3,
+    15.6,
+    14.0,
+    17.3,
+    12.5
+  ];
+
+  random_index := 1 + floor(random() * 5);
+
+  RETURN screen_sizes[random_index];
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION generate_cpu()
+RETURNS VARCHAR(20) AS $$
+DECLARE
+  cpu_models VARCHAR[];
+  random_index INT;
+BEGIN
+  cpu_models := ARRAY[
+    'Intel Core i7',
+    'Intel Core i5',
+    'AMD Ryzen 7',
+    'AMD Ryzen 5',
+    'Intel Core i9',
+    'AMD Ryzen 9',
+    'Apple M1',
+    'Qualcomm Snapdragon',
+    'Intel Core i3',
+    'Intel Celeron'
+  ];
+
+  random_index := 1 + floor(random() * 10);
+
+  RETURN cpu_models[random_index];
+END;
+$$ LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION generate_video_card()
+RETURNS VARCHAR(20) AS $$
+DECLARE
+  videocard_models VARCHAR[];
+  random_videocard_index INT;
+BEGIN
+  videocard_models := ARRAY[
+    'NVIDIA GeForce GTX 1650',
+    'AMD Radeon RX 560X',
+    'NVIDIA RTX 3060',
+    'AMD Radeon RX 6600 XT',
+    'NVIDIA RTX 3080'
+  ];
+
+  random_videocard_index := 1 + floor(random() * 5);
+
+  RETURN videocard_models[random_videocard_index];
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TEMP TABLE temp_data AS
+WITH random_data AS (
+    SELECT
+        generate_series(1, 2000) AS id,
+        generate_laptop_model() AS model,
+        generate_screen_size() AS screen_size,
+        generate_cpu() AS cpu,
+        generate_video_card() AS video_card,
+        256 * floor(1 + random() * 4) AS memory_size
+)
+SELECT * FROM random_data;
+
+INSERT INTO laptop (id, model, screen_size, cpu, video_card, memory_size)
+SELECT id, model, screen_size, cpu, video_card, memory_size
+FROM temp_data;
+
+DROP TABLE temp_data;
+CREATE OR REPLACE FUNCTION generate_discount_dates()
+RETURNS TIMESTAMP[] AS $$
+DECLARE
+  discount_dates TIMESTAMP[] := '{}';
+  current_year INT := date_part('year', current_date)::INT;
+  random_loop_count INT;
+BEGIN
+  random_loop_count := floor(random() * 6) + 1;
+
+  FOR i IN 1..random_loop_count LOOP
+    discount_dates := discount_dates || (make_date(current_year, 1, 1) + (floor(random() * 365) * interval '1 day'));
+  END LOOP;
+
+  RETURN discount_dates;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION generate_description()
+RETURNS TEXT AS $$
+DECLARE
+  first_word TEXT[];
+  second_word TEXT[];
+  third_word TEXT[];
+  random_description TEXT;
+BEGIN
+  first_word := ARRAY[
+    'Новый', 'Современный', 'Быстрый', 'Энергоемкий', 'Уникальный', 'Премиальный'];
+  second_word := ARRAY[
+    'тонкий', 'красивый', 'доступный', 'влагозащишенный', 'ударопрочный'];
+  third_word := ARRAY[
+    'ультрабук', 'лэптоп', 'ноубук'];
+
+  random_description := first_word[floor(random() * 6) + 1]  ' и '  second_word[floor(random() * 5) + 1]  ' '  third_word[floor(random() * 3) + 1];
+
+  RETURN random_description;
+END;
+$$ LANGUAGE plpgsql;
+
+INSERT INTO offer (laptop_id, store_id, price, batch_size, discount_dates, description)
+SELECT
+  floor(random() * 2000) + 1,
+  floor(random() * 1200) + 1,
+  500 + random() * 3000,
+  floor(random() * 50),
+  generate_discount_dates(),
+  generate_description()
+FROM generate_series(1, 1020000);
+
+CREATE OR REPLACE FUNCTION generate_fio()
+RETURNS VARCHAR(50) AS $$
+DECLARE
+  first_name VARCHAR[];
+  middle_name VARCHAR[];
+  last_name VARCHAR[];
+  random_description TEXT;
+BEGIN
+  first_name := ARRAY[
+    'Игорь',
+    'Петр',
+    'Сергей',
+    'Алексей',
+    'Дмитрий',
+    'Денис',
+    'Ян',
+    'ОЛег',
+    'Валерий',
+    'Кирилл'
+];
+
+middle_name := ARRAY[
+    'Иванович',
+    'Петрович',
+    'Сергеевич',
+    'Алексеевич',
+    'Игоревич',
+    'Андреевич',
+    'Дмитриевич',
+    'Олегович',
+    'Владимирович',
+    'Николаевич'
+];
+
+last_name := ARRAY[
+    'Смирнов',
+    'Иванов',
+    'Кузнецов',
+    'Попов',
+    'Соколов',
+    'Лебедев',
+    'Козлов',
+    'Новиков',
+    'Морозов',
+    'Петров'
+];
+
+  random_description := first_name[floor(random() * 10) + 1]  ' '  middle_name[floor(random() * 10) + 1]  ' '  last_name[floor(random() * 10) + 1];
+
+  RETURN random_description;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION generate_info()
+RETURNS JSONB AS $$
+DECLARE
+  contact_info JSONB;
+BEGIN
+  contact_info := jsonb_build_object(
+    'address', generate_address(),
+    'phone', generate_phone(),
+    'email', generate_email()
+  );
+  RETURN contact_info;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION generate_phone()
+RETURNS VARCHAR(11) AS $$
+DECLARE
+  phone_number VARCHAR(11);
+BEGIN
+  phone_number := '';
+  FOR i IN 1..11 LOOP
+    phone_number := phone_number || floor(random() * 10)::VARCHAR;
+  END LOOP;
+RETURN phone_number;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION generate_email()
+RETURNS VARCHAR(30) AS $$
+DECLARE
+  username VARCHAR(20);
+  domain VARCHAR(10);
+BEGIN
+  username := substring(md5(random()::text), 1, 10);
+  domain := substring(md5(random()::text), 1, 10);
+  RETURN username  '@'  domain || '.com';
+END;
+$$ LANGUAGE plpgsql;
+
+
+INSERT INTO sale (offer_id, laptop_id, customer_fio, customer_info, sale_date)
+SELECT
+  floor(random() * 1000000) + 1 AS oid,
+  SELECT laptop_id FROM offer AS o WHERE o.id = oid LIMIT 1,
+  generate_fio(),
+  generate_info(),
+  current_date - (floor(random() * 1825) || ' days')::interval
+FROM generate_series(1, 1000);
+
+
+UPDATE sale AS s
+SET laptop_id = o.laptop_id
+FROM offer AS o
+WHERE s.offer_id = o.id;
