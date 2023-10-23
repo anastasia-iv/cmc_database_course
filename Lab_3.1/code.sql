@@ -3,7 +3,7 @@ CREATE SCHEMA stat;
 
 CREATE TABLE stat.location (
   	location_id SERIAL PRIMARY KEY,
-    location_name text[],
+    location_name text,
     years_of_existance integer,
     num_exhibitions integer,
     raiting real
@@ -33,15 +33,9 @@ CREATE TABLE stat.tickets (
 CREATE OR REPLACE FUNCTION marks_array_gen()
 RETURNS integer[] AS $$
 DECLARE
-  marks_array integer[] := '{}';
   marks_num INT;
 BEGIN
   marks_num := ceil(random() * 6);
-
-  -- FOR i IN 1..marks_num LOOP
-  --   marks_array := marks_array || (ceil(random()*10);
-  -- END LOOP;
-
   RETURN (SELECT array_agg(ceil(random()*10)) FROM generate_series(0, marks_num));
 END;
 $$ LANGUAGE plpgsql;
@@ -79,3 +73,39 @@ SELECT
   achievments_gen()
 FROM generate_series(1, 1000000);
 
+DO $$
+BEGIN
+  FOR I IN 1..18 LOOP
+  INSERT INTO stat.location (location_name, years_of_existance, num_exhibitions, raiting)
+  SELECT 
+    ('{Рогожская слобода, Венская ратуша, Церковь Всех Святых во Всехсвятском на Соколе, Кафедральный собор, Федорова, Юдиттен-кирха, Тарау-кирха, Цинтена-кирха, Гамбургский Кунстхалле, Мармоттан-Моне, музей Метрополии Лилля, музей Берлинской живописи, Орсе, Эрмитаж, Санта-Мария дель Кармине, Памятник Давиду, Зимний дворец, Смольный Новодевичий женский монастырь}'::text[])[I],
+    (random() * 50)::integer,
+    (random() * 6)::integer,
+    (random() * 100)::real;
+  END LOOP;
+END;
+$$
+
+
+CREATE OR REPLACE FUNCTION info_gen()
+RETURNS JSONB AS $$
+DECLARE
+  inf JSONB;
+  type_of_ticket TEXT[];
+  priv TEXT[];
+BEGIN
+  type_of_ticket := ARRAY['Входной', 'Абонемент', 'Экскурсионный', 'В рамках учебной программы'];
+  priv := ARRAY['Льготный','Обычный', 'Бесплатный', 'Призовой'];
+  inf := '{"type":' || type[ceil(random()*4)] || ', "privileges": ' || priv[ceil(random()*4)] || '}';
+  RETURN info;
+END;
+$$ LANGUAGE plpgsql;
+
+INSERT INTO stat.tickets (student_id, price_dollars, info, location_id, date_of_purchase)
+SELECT 
+  ceil(random() * 1000000)::integer,
+  round (CAST(random()*100 + 3 AS numeric),2),
+  info_gen(),
+  ceil(random() * 18)::integer,
+  timestamp '2014-01-10 20:00:00' + random() * (timestamp '2014-01-20 20:00:00' - current_date)
+FROM generate_series(1, 100000000); 
