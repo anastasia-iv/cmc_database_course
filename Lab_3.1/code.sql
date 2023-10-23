@@ -53,7 +53,11 @@ BEGIN
   num_of_events := ceil(random()*4);
 
   FOR i IN 1..num_of_events LOOP
-    achievment :=  achievment || levels[ceil(random() * 5)] || type_of_event[ceil(random() * 6)] || ',' ;
+    IF I = num_of_events THEN
+      achievment :=  achievment || levels[ceil(random() * 5)] || type_of_event[ceil(random() * 6)] || '.' ;
+    ELSE
+      achievment :=  achievment || levels[ceil(random() * 5)] || type_of_event[ceil(random() * 6)] || ',' ;
+    END IF;
   END LOOP;
     
   RETURN achievment;
@@ -94,9 +98,10 @@ DECLARE
   type_of_ticket TEXT[];
   priv TEXT[];
 BEGIN
-  type_of_ticket := ARRAY['"Входной"', '"Абонемент"', '"Экскурсионный"', '"В рамках учебной программы"'];
-  priv := ARRAY['"Льготный"','"Обычный"', '"Бесплатный"', '"Призовой"'];
-  inf := '{"type":' || type_of_ticket[ceil(random()*4)] || ', "privileges": ' || priv[ceil(random()*4)] || '}';
+  type_of_ticket := ARRAY['Входной', 'Абонемент', 'Экскурсионный', 'В рамках учебной программы'];
+  priv := ARRAY['Льготный','Обычный', 'Бесплатный', 'Призовой'];
+  inf := jsonb_build_object('type', type_of_ticket[ceil(random()*4)], 
+                            'privileges', priv[ceil(random()*4)] );
   RETURN inf;
 END;
 $$ LANGUAGE plpgsql;
@@ -107,6 +112,6 @@ SELECT
   round (CAST(random()*100 + 3 AS numeric),2),
   info_gen(),
   ceil(random() * 18)::integer,
-  timestamp '2014-01-10 20:00:00' + random() * (timestamp '2014-01-20 20:00:00' - current_date)
+  timestamp '2014-01-10 20:00:00' + random() * (current_date - timestamp '2014-01-20 20:00:00')
 FROM generate_series(1, 100000000); 
 
