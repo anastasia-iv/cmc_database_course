@@ -94,10 +94,10 @@ DECLARE
   type_of_ticket TEXT[];
   priv TEXT[];
 BEGIN
-  type_of_ticket := ARRAY['Входной', 'Абонемент', 'Экскурсионный', 'В рамках учебной программы'];
-  priv := ARRAY['Льготный','Обычный', 'Бесплатный', 'Призовой'];
-  inf := '{"type":' || type[ceil(random()*4)] || ', "privileges": ' || priv[ceil(random()*4)] || '}';
-  RETURN info;
+  type_of_ticket := ARRAY['"Входной"', '"Абонемент"', '"Экскурсионный"', '"В рамках учебной программы"'];
+  priv := ARRAY['"Льготный"','"Обычный"', '"Бесплатный"', '"Призовой"'];
+  inf := '{"type":' || type_of_ticket[ceil(random()*4)] || ', "privileges": ' || priv[ceil(random()*4)] || '}';
+  RETURN inf;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -109,3 +109,4 @@ SELECT
   ceil(random() * 18)::integer,
   timestamp '2014-01-10 20:00:00' + random() * (timestamp '2014-01-20 20:00:00' - current_date)
 FROM generate_series(1, 100000000); 
+
