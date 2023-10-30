@@ -27,14 +27,14 @@
 
 REVOKE ALL PRIVILEGES ON SCHEMA stat FROM test;
 REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA stat FROM test;
-REVOKE ALL PRIVILEGES ON SCHEMA stat FROM test_view;
-REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA stat FROM test_view;
+REVOKE ALL PRIVILEGES ON SCHEMA stat FROM new_user;
+REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA stat FROM new_user;
 DROP VIEW students_msu;
 DROP VIEW location_list;
 DROP USER test;
 
 DROP USER standart_role;
-DROP USER test_view;
+DROP USER new_user;
 
 CREATE USER test PASSWORD '12345';
 GRANT USAGE ON SCHEMA stat TO test;
@@ -66,10 +66,10 @@ GRANT SELECT ON location_list TO test;
 
 CREATE ROLE standart_role;
 GRANT SELECT, UPDATE (course, marks) ON students_msu TO standart_role;
-CREATE USER test_view PASSWORD '12345';
+CREATE USER new_user PASSWORD '12345';
 
-GRANT test_role TO test_view;
-GRANT USAGE ON SCHEMA stat to test_view;
+GRANT standart_role TO new_user;
+GRANT USAGE ON SCHEMA stat to new_user;
 GRANT USAGE ON SCHEMA stat to test;
 --USAGE доступ к схеме, чтобы использовать объекты внутри нее
 
