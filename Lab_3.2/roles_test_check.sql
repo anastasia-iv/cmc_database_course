@@ -16,9 +16,9 @@ SELECT * FROM location_list LIMIT 5;
 
 --testing role role_new
 
-SET ROLE role_new;
+SET ROLE new_user;
 SELECT * FROM students_msu LIMIT 5;
-UPDATE student_msu SET marks= array[5, 5, 5] WHERE student_id = 1;
-SELECT * FROM students_msu LIMIT 5;
+UPDATE students_msu SET marks= array[5, 5, 5] WHERE student_id = 2;
+SELECT * FROM students_msu  ORDER BY student_id LIMIT 5;
 
  
