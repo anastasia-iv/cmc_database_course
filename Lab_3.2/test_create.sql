@@ -40,13 +40,13 @@ CREATE USER test PASSWORD '12345';
 GRANT USAGE ON SCHEMA stat TO test;
 
 GRANT SELECT, UPDATE, INSERT ON stat.tickets TO test;
-GRANT SELECT (student_id, university_id, university_name, course, marks, achievments), UPDATE (course, marks, achievments) ON stat.students TO test;
+GRANT SELECT (student_id, university_name, course, marks, achievments), UPDATE (course, marks, achievments) ON stat.students TO test;
 GRANT SELECT ON stat.location TO test;
 
 CREATE OR REPLACE VIEW students_msu AS
     SELECT student_id, student_name, course, marks
     FROM stat.students
-    WHERE university = "МГУ"
+    WHERE university_name = 'МГУ'
     WITH CASCADED CHECK OPTION;
 /*
 Если оно присутствует, при выполнении операций INSERT и UPDATE с этим представлением будет проверяться,
@@ -61,7 +61,7 @@ CASCADED  -  Новые строки проверяются по условия�
 
 CREATE OR REPLACE VIEW location_list AS
     SELECT location_id, location_name
-    FROM schedule.exams;
+    FROM stat.location;
 GRANT SELECT ON location_list TO test;
 
 CREATE ROLE standart_role;
@@ -74,3 +74,5 @@ GRANT USAGE ON SCHEMA stat to test;
 --USAGE доступ к схеме, чтобы использовать объекты внутри нее
 
 REVOKE ALL PRIVILEGES ON table FROM user
+
+
