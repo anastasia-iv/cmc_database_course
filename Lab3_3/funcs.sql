@@ -83,7 +83,21 @@ $$ LANGUAGE plpgsql;
 -- который принимает на вход параметр, но тогда без exeption
 st_cur CURSOR(s text) FOR SELECT * FROM stat.students WHERE students.university_name = st_cur.s;
 
+--функция, которая выводит все произведенные покупки билетов за определенный месяц
+CREATE OR REPLACE FUNCTION tickets_in_month("month" integer) RETURNS table(t_id integer, pr numeric, "time" timestamp) AS $$
+DECLARE
+    tick_curs CURSOR FOR SELECT * FROM stat.tickets;
+BEGIN
+    IF ($1 > 12) OR ($1 <= 0) THEN
+	RAISE EXCEPTION 'Неверный формат входных данных: месяц должен лежать в диапазоне [1,12].';
+    END IF;
+    FOR entry in tick_curs LOOP
+        IF date_part('month', entry.date_of_purchase) = $1 THEN
+            RETURN QUERY SELECT entry.ticket_id, entry.price_dollars, entry.date_of_purchase;
+        END IF;
+    END LOOP;
+    RETURN;
+END;
+$$ LANGUAGE plpgsql;
 
-
-
-Обосновать преимущества механизма функций перед механизмом представлений:
+SELECT * FROM tickets_in_month(2);
