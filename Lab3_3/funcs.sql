@@ -1,56 +1,3 @@
-– Циклы
-
---Функция генерации достижений студентов 
-CREATE OR REPLACE FUNCTION achievments_gen()
-RETURNS TEXT AS $$
-DECLARE
-  levels TEXT[];
-  type_of_event TEXT[];
-  num_of_events INT;
-  achievment TEXT:='';
-BEGIN
-  levels := ARRAY['Всемирн', 'Национальн', 'Муниципаль', 'Учебн', 'Профессиональн'];
-  type_of_event := ARRAY['ая олипмиада', 'ый хакатон', 'ая конференция', 'ый вебинар', 'ое соревнование', 'ый митап'];
-  num_of_events := ceil(random()*4);
-
-  FOR i IN 1..num_of_events LOOP
-    IF i = num_of_events THEN
-      achievment :=  achievment || levels[ceil(random() * 5)] || type_of_event[ceil(random() * 6)] || '.' ;
-    ELSE
-      achievment :=  achievment || levels[ceil(random() * 5)] || type_of_event[ceil(random() * 6)] || ',' ;
-    END IF;
-  END LOOP;
-  RETURN achievment;
-END;
-$$ LANGUAGE plpgsql;
-
---функция генерации оценок
-CREATE OR REPLACE FUNCTION marks_array_gen()
-RETURNS integer[] AS $$
-DECLARE
-  marks_num INT;
-BEGIN
-  marks_num := ceil(random() * 6);
-  RETURN (SELECT array_agg(ceil(random()*10)) FROM generate_series(0, marks_num));
-END;
-$$ LANGUAGE plpgsql;
-
---функция генерации информации о билетаъ
-CREATE OR REPLACE FUNCTION info_gen()
-RETURNS JSONB AS $$
-DECLARE
-  inf JSONB;
-  type_of_ticket TEXT[];
-  priv TEXT[];
-BEGIN
-  type_of_ticket := ARRAY['Входной', 'Абонемент', 'Экскурсионный', 'В рамках учебной программы'];
-  priv := ARRAY['Льготный','Обычный', 'Бесплатный', 'Призовой'];
-  inf := jsonb_build_object('type', type_of_ticket[ceil(random()*4)], 
-                            'privileges', priv[ceil(random()*4)] );
-  RETURN inf;
-END;
-$$ LANGUAGE plpgsql;
-
 --функция, которая считает средний балл у студентов, учащихся в определенном учебном заведении
 CREATE OR REPLACE FUNCTION average_uni(university TEXT) RETURNS real AS $$
 DECLARE
@@ -101,3 +48,55 @@ END;
 $$ LANGUAGE plpgsql;
 
 SELECT * FROM tickets_in_month(2);
+
+--Функция генерации достижений студентов 
+CREATE OR REPLACE FUNCTION achievments_gen()
+RETURNS TEXT AS $$
+DECLARE
+  levels TEXT[];
+  type_of_event TEXT[];
+  num_of_events INT;
+  achievment TEXT:='';
+BEGIN
+  levels := ARRAY['Всемирн', 'Национальн', 'Муниципаль', 'Учебн', 'Профессиональн'];
+  type_of_event := ARRAY['ая олипмиада', 'ый хакатон', 'ая конференция', 'ый вебинар', 'ое соревнование', 'ый митап'];
+  num_of_events := ceil(random()*4);
+
+  FOR i IN 1..num_of_events LOOP
+    IF i = num_of_events THEN
+      achievment :=  achievment || levels[ceil(random() * 5)] || type_of_event[ceil(random() * 6)] || '.' ;
+    ELSE
+      achievment :=  achievment || levels[ceil(random() * 5)] || type_of_event[ceil(random() * 6)] || ',' ;
+    END IF;
+  END LOOP;
+  RETURN achievment;
+END;
+$$ LANGUAGE plpgsql;
+
+--функция генерации оценок
+CREATE OR REPLACE FUNCTION marks_array_gen()
+RETURNS integer[] AS $$
+DECLARE
+  marks_num INT;
+BEGIN
+  marks_num := ceil(random() * 6);
+  RETURN (SELECT array_agg(ceil(random()*10)) FROM generate_series(0, marks_num)); --каждое входное значение array_agg присваивается элементу массива
+END;
+$$ LANGUAGE plpgsql;
+
+--функция генерации информации о билетах
+CREATE OR REPLACE FUNCTION info_gen()
+RETURNS JSONB AS $$
+DECLARE
+  inf JSONB;
+  type_of_ticket TEXT[];
+  priv TEXT[];
+BEGIN
+  type_of_ticket := ARRAY['Входной', 'Абонемент', 'Экскурсионный', 'В рамках учебной программы'];
+  priv := ARRAY['Льготный','Обычный', 'Бесплатный', 'Призовой'];
+  inf := jsonb_build_object('type', type_of_ticket[ceil(random()*4)], 
+                            'privileges', priv[ceil(random()*4)] );
+  RETURN inf;
+END;
+$$ LANGUAGE plpgsql;
+
