@@ -23,7 +23,7 @@ BEGIN
     RETURN marks_sum/marks_num;
 END;
 $$ LANGUAGE plpgsql;
-
+SELECT * FROM average_uni('МГУ');
 
 -- В данной функции еще можно было бы сделать объявление с курсором,
 -- который принимает на вход параметр, но тогда без exeption
@@ -45,7 +45,6 @@ BEGIN
     RETURN;
 END;
 $$ LANGUAGE plpgsql;
-
 SELECT * FROM tickets_in_month(2);
 
 --Функция генерации достижений студентов 
