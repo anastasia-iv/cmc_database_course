@@ -5,13 +5,12 @@ DECLARE
     flag bool = FALSE;
     marks_sum real = 0;
     marks_num int = 0;
-	mark int;
+    mark int;
 BEGIN
     --в данной реализации курсор открывается и закрывается атвоматически 
     FOR entry in st_cur LOOP
         IF entry.university_name = $1 THEN
-            FOREACH mark IN ARRAY entry.marks 
-			LOOP
+            FOREACH mark IN ARRAY entry.marks LOOP
                 marks_sum = marks_sum + mark;
                 marks_num = marks_num + 1;
             END LOOP;
