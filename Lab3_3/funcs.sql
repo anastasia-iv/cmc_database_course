@@ -98,3 +98,40 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+--функция покупки нового билета
+CREATE OR REPLACE FUNCTION create_ticket(st_id integer, pr numeric(8, 2), t_type text, t_privileges text, loc_id integer) RETURNS void AS $$
+DECLARE
+	inf_make JSONB;
+BEGIN
+	inf_make := jsonb_build_object('type', t_type, 
+                            'privileges', t_privileges);
+    INSERT INTO stat.tickets (student_id, price_dollars, "info", location_id, date_of_purchase) 
+		VALUES (st_id, pr, inf_make, loc_id, current_timestamp);
+    RETURN;
+END;
+$$ LANGUAGE plpgsql;
+SELECT * FROM create_ticket(1, 1.2, 'Экскурсионный', 'Обычный', 2);
+
+Время при использовании функции:
+month time
+2 00:00:00.266
+1 00:00:00.311
+
+5 00:00:00.195
+5 00:00:00.201
+
+9 00:00:00.260
+9 00:00:00.419
+	
+Время при использовании запроса:
+month time
+2 00:00:00.199
+1 00:00:00.272
+
+5 00:00:00.195
+5 00:00:00.199
+
+9 00:00:00.194
+9 00:00:00.305
+
+
