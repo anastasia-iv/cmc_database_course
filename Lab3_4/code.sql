@@ -26,13 +26,14 @@ CREATE INDEX student_course ON stat.students (course);
 EXPLAIN ANALYZE SELECT * FROM stat.students WHERE course < 3;
 /*
 "QUERY PLAN"
-"Bitmap Heap Scan on students  (cost=2756.48..45053.89 rows=247233 width=234) (actual time=56.979..815.494 rows=249901 loops=1)"
-"  Recheck Cond: (course < 3)"
-"  Heap Blocks: exact=33624"
-"  ->  Bitmap Index Scan on students_index  (cost=0.00..2694.67 rows=247233 width=0) (actual time=36.055..36.056 rows=249901 loops=1)"
-"        Index Cond: (course < 3)"
-"Planning Time: 0.359 ms"
-"Execution Time: 851.477 ms"
+"Gather  (cost=1000.00..167145.28 rows=45202 width=66) (actual time=23.866..4350.611 rows=17291 loops=1)"
+"  Workers Planned: 2"
+"  Workers Launched: 2"
+"  ->  Parallel Seq Scan on meas2023 meas  (cost=0.00..161625.08 rows=18834 width=66) (actual time=48.450..4107.197 rows=5764 loops=3)"
+"        Filter: (date(date_of_purchase) = '2022-01-22'::date)"
+"        Rows Removed by Filter: 2091063"
+"Planning Time: 0.271 ms"
+"Execution Time: 4358.014 ms"
 */
 
 
